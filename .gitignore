@@ -1,0 +1,15 @@
+#
+# Dexter Toolkit - .gitignore
+# Mantém apenas os arquivos essenciais do projeto no controle de versão.
+#
+
+# Ignora tudo por padrão
+*
+
+# Excetua os arquivos essenciais
+!.gitignore
+!dexter.sh
+!install-apt.sh
+!install-arch.sh
+!install-windows.ps1
+

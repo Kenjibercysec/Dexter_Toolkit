@@ -89,7 +89,7 @@ neon_header() {
   show_banner
   printf "%b\n" "${CLR_RESET}"
   printf "%b" "${CLR_GREEN}"
-  echo "  neon recon panel — realtime output (no files saved)"
+  echo "Tonight is the night"
   printf "%b\n\n" "${CLR_RESET}"
 }
 

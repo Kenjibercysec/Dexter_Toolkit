@@ -4,29 +4,61 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Linux-lightgrey)
 
-A comprehensive penetration testing and security assessment toolkit built for security professionals and ethical hackers.
+Dexter Toolkit orquestra, em um único painel interativo, várias etapas comuns de reconhecimento ofensivo. O `dexter.sh` detecta quais binários estão instalados, apresenta apenas opções viáveis e executa cada módulo em tempo real, sem gerar arquivos temporários.
 
-## Features
+## Principais módulos
 
-* **Directory & File Discovery** — Advanced directory brute-forcing capabilities.
-* **XSS Scanning** — Cross-site scripting vulnerability detection.
-* **Custom Wordlist Integration** — Support for multiple wordlist formats and custom lists.
-* **Output Management** — Organized results and report generation.
-* **Modular Architecture** — Easy to extend and customize with additional modules.
+- **Run all** — dispara, em sequência, todos os módulos disponíveis na máquina.
+- **Nmap** — presets rápidos de varredura (`-sV`, `-A`, `-p-`, etc.) com ajuste de portas adicionais.
+- **crt.sh** — enumeração de subdomínios via API pública com parsing opcional por `jq`.
+- **Subfinder** — integração direta com o binário `subfinder`.
+- **Dirsearch** — execução local do `dirsearch.py` clonado no repositório.
+- **FFUF** — brute force de conteúdo com seleção de wordlists em `seclists/` ou `wordlists/`.
+- **XSStrike** — detecção automática do binário local, módulo Python ou repositório clonado do XSStrike.
+- **Banner & limpeza** — utilitários para refrescar a interface.
 
 ## Prerequisites
 
 Before using Dexter Toolkit, make sure you have the following installed:
 
-* **Linux** (Ubuntu, Debian, Kali, Arch, etc.)
-* **Bash** (v4.0 or higher)
-* **Git**
-* **Python 3** (required by some components)
-* **Common security tools** (these will be checked during setup)
+- **Bash 4+**
+- **Git**
+- **Python 3** (para `dirsearch` e XSStrike via repositório)
+- **curl** e **jq**
+- **nmap**, **ffuf**, **subfinder** (o `dexter.sh` ignora o que não estiver presente)
+- **Go** (caso deseje instalar `ffuf`/`subfinder` via `go install`)
+- **pip/pip3** (para dependências Python do XSStrike)
 
 ## Installation
 
-### Quick install
+### Instalação automatizada
+
+Os scripts de instalação configuram dependências, clonam repositórios auxiliares (`dirsearch`, `XSStrike`, `SecLists`) e tentam instalar `ffuf`/`subfinder`. Execute o script adequado para o seu ambiente a partir da raiz do repositório:
+
+- Debian, Ubuntu, Kali e derivados:
+
+```bash
+chmod +x install-apt.sh
+sudo ./install-apt.sh
+```
+
+- Arch, Manjaro e derivados:
+
+```bash
+chmod +x install-arch.sh
+sudo ./install-arch.sh
+```
+
+- Windows (PowerShell 7+):
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\install-windows.ps1
+```
+
+Os scripts detectam gerenciadores (`apt`, `pacman`, `winget`, `choco`, `yay`, `paru`) e utilizam `git pull` quando os diretórios já existem. Ao final, confirme se o diretório de binários do Go (`$(go env GOPATH)/bin`) está no `PATH` quando `go install` for utilizado.
+
+### Clonando e executando manualmente
 
 ```bash
 git clone https://github.com/Kenjibercysec/Dexter_Toolkit.git
@@ -44,88 +76,65 @@ git clone https://github.com/Kenjibercysec/Dexter_Toolkit.git
 # Navigate to the toolkit directory
 cd Dexter_Toolkit
 
-# Make scripts executable
-chmod +x dexter.sh xss.sh
+# Conceda permissão de execução ao painel principal
+chmod +x dexter.sh
 
-# Run the main tool
+# Rode o painel interativo
 ./dexter.sh
 ```
 
 ## Wordlists Setup
 
-**Important:** Dexter Toolkit requires wordlists for effective operation. Wordlists are not included due to size and licensing — download them separately.
-
-**Option 1: Using the included downloader script (recommended)**
+O `dexter.sh` procura wordlists dentro de `seclists/` e `wordlists/`. Caso nenhum arquivo seja encontrado, o usuário pode fornecer o caminho completo manualmente. Os scripts de instalação já clonam o repositório `SecLists`; você também pode:
 
 ```bash
-# Run the wordlist downloader if available
-./download_wordlists.sh
-```
-
-**Option 2: Manual wordlist installation**
-
-```bash
-# Clone SecLists into a local directory
+# Clonar SecLists manualmente
 git clone --depth 1 https://github.com/danielmiessler/SecLists.git seclists
 
-# Or download specific lists you need
+# Criar um diretório dedicado para listas próprias
 mkdir -p wordlists
+# Exemplo: adicionar rockyou.txt
 wget -O wordlists/rockyou.txt https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
-```
-
-**Essential wordlists to consider:**
-
-* `rockyou.txt` — popular password wordlist
-* `SecLists` — comprehensive collection for security testing
-* DirBuster / directory enumeration lists — for web discovery
-
-**Option 3: Using the system package manager (Kali Linux)**
-
-```bash
-sudo apt update
-sudo apt install seclists wordlists
 ```
 
 ## Usage
 
 ### Main interface
 
-Run the main script to start the interactive menu:
+Rode o painel principal para acessar o menu interativo:
 
 ```bash
 ./dexter.sh
 ```
 
-The interactive menu provides the following options:
+O menu apresenta as opções abaixo. Apenas as que tiverem binários detectados serão executadas; o restante é ignorado com mensagens informativas.
 
-* **Directory Scanning** — Web directory enumeration
-* **XSS Testing** — Cross-site scripting checks
-* **Custom Scans** — User-configured scanning workflows
-* **Output Management** — View and manage scan results and reports
+- `1) Run all available modules` — executa sequencialmente Subfinder, crt.sh, Nmap, Dirsearch, FFUF e XSStrike.
+- `2) Nmap` — presets interativos com suporte a portas extras.
+- `3) Subdomain enumeration (crt.sh)` — consulta direta à API crt.sh com formatação por `jq` quando disponível.
+- `4) Subfinder` — chama `subfinder -d <domínio>`.
+- `5) Dirsearch` — wrapper simples para `dirsearch.py`, permitindo ajustar extensões e threads.
+- `6) FFUF` — executa `ffuf` com seleção de wordlist e filtros de código/tamanho.
+- `7) XSStrike` — detecta a forma de execução (binário, módulo Python ou repositório local) e oferece presets comuns.
+- `8) Show banner` — redesenha o cabeçalho neon.
+- `9) Clear screen` — limpa o terminal e mostra o banner novamente.
+- `0) Exit` — encerra o painel.
 
-### Direct script usage
-
-Run individual utilities directly when needed:
-
-```bash
-# Run the XSS scanner against a target
-./xss.sh -u https://example.com
-
-# Use a custom configuration file
-./dexter.sh --config scan.lib
-```
+**Observação:** todo output é exibido ao vivo no terminal; nenhum arquivo é salvo por padrão. Utilize redirecionamento manual (`tee`, `>` etc.) caso deseje persistir resultados.
 
 ## Project structure
 
 ```
 Dexter_Toolkit/
-├── dexter.sh                # Main toolkit interface
-├── xss.sh                   # XSS scanning utility
-├── scan.lib                 # Scanning configuration library
-├── xnss-dir.json            # Directory scanning configuration
-├── dirsearch/               # Directory brute-forcing tool
-├── output/                  # Scan results and reports
-└── download_wordlists.sh    # Wordlist download utility
+├── dexter.sh             # Painel interativo principal
+├── install-apt.sh        # Instalação automatizada para Debian/Ubuntu/Kali
+├── install-arch.sh       # Instalação automatizada para Arch/Manjaro
+├── install-windows.ps1   # Instalação automatizada para Windows (PowerShell)
+├── dirsearch/            # Clonado pelos scripts de instalação (opcional)
+├── XSStrike/             # Clonado pelos scripts de instalação (opcional)
+├── seclists/             # Coleção de wordlists (opcional, mas recomendado)
+├── wordlists/            # Wordlists personalizadas (opcional)
+└── README.md
 ```
 
 ## Contributing
