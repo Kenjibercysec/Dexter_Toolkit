@@ -49,12 +49,14 @@ chmod +x install-arch.sh
 sudo ./install-arch.sh
 ```
 
-- Windows (PowerShell 7+):
+- Windows (Git Bash ou WSL):
 
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\install-windows.ps1
+```bash
+chmod +x install-windows.sh
+./install-windows.sh
 ```
+
+**Nota:** O script bash funciona no Git Bash (incluído com Git for Windows) ou no WSL. Ele detecta automaticamente `winget` ou `choco` para instalar dependências. Se preferir usar PowerShell, há também `install-windows.ps1` disponível.
 
 Os scripts detectam gerenciadores (`apt`, `pacman`, `winget`, `choco`, `yay`, `paru`) e utilizam `git pull` quando os diretórios já existem. Ao final, confirme se o diretório de binários do Go (`$(go env GOPATH)/bin`) está no `PATH` quando `go install` for utilizado.
 
@@ -129,7 +131,8 @@ Dexter_Toolkit/
 ├── dexter.sh             # Painel interativo principal
 ├── install-apt.sh        # Instalação automatizada para Debian/Ubuntu/Kali
 ├── install-arch.sh       # Instalação automatizada para Arch/Manjaro
-├── install-windows.ps1   # Instalação automatizada para Windows (PowerShell)
+├── install-windows.sh    # Instalação automatizada para Windows (Git Bash/WSL)
+├── install-windows.ps1   # Instalação automatizada para Windows (PowerShell - alternativo)
 ├── dirsearch/            # Clonado pelos scripts de instalação (opcional)
 ├── XSStrike/             # Clonado pelos scripts de instalação (opcional)
 ├── seclists/             # Coleção de wordlists (opcional, mas recomendado)
