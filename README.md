@@ -188,6 +188,7 @@ Dexter_Toolkit/
 ## Ferramentas incluídas
 
 O Dexter Toolkit inclui as seguintes ferramentas de segurança:
+Lembrando que eventualmente todas as ferramentas serão marcadas aqui.
 
 | Ferramenta | Tipo | Descrição |
 |------------|------|-----------|
