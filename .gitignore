@@ -7,13 +7,16 @@
 *
 
 # Excetua os arquivos essenciais
+# Permite arquivos essenciais
 !.gitignore
-!dexter.sh
-!install-apt.sh
-!install-arch.sh
-!install-windows.sh
-!install-windows.ps1
 !README.md
+!dexter.sh
+!build-docker.sh
+!docker-compose.yml
+!docker-entrypoint.sh
+!Dockerfile
+!ADDING_TOOLS.md
+!pleasework.txt
 
 # Ignora o venv (criado automaticamente)
 .venv/

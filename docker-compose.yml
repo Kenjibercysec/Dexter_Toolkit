@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  dexter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dexter-toolkit:latest
+    container_name: dexter-toolkit
+    stdin_open: true
+    tty: true
+    network_mode: host
+    volumes:
+      # Montar wordlists do host
+      - ./wordlists:/opt/dexter/wordlists
+      - ./seclists:/opt/tools/seclists
+      # Montar diretório de resultados
+      - ./results:/opt/dexter/results
+      # Opcional: montar script customizado
+      - ./dexter.sh:/opt/dexter/dexter.sh
+    environment:
+      - TZ=UTC
+    # Permissões necessárias para algumas ferramentas
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    # Para scans de rede
+    privileged: false
+    restart: unless-stopped
