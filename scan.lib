@@ -1,4 +1,0 @@
-# Placeholder for additional functions
-scan_log() {
-    echo "[LOG] $1"
-}

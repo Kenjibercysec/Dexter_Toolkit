@@ -11,5 +11,10 @@
 !dexter.sh
 !install-apt.sh
 !install-arch.sh
+!install-windows.sh
 !install-windows.ps1
+!README.md
+
+# Ignora o venv (criado automaticamente)
+.venv/
 

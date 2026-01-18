@@ -15,6 +15,12 @@ Dexter Toolkit orquestra, em um único painel interativo, várias etapas comuns 
 - **Dirsearch** — execução local do `dirsearch.py` clonado no repositório.
 - **FFUF** — brute force de conteúdo com seleção de wordlists em `seclists/` ou `wordlists/`.
 - **XSStrike** — detecção automática do binário local, módulo Python ou repositório clonado do XSStrike.
+- **HTTPX** — sondagem HTTP/HTTPS rápida com detecção de tecnologias, títulos e status codes.
+- **RustScan** — scanner de portas ultrarrápido com integração ao Nmap.
+- **SQLMap** — detecção e exploração automatizada de vulnerabilidades de injeção SQL.
+- **BloodHound** — coletor de dados do Active Directory para análise de relações e caminhos de ataque.
+- **Evil-WinRM** — shell interativo WinRM para acesso remoto a sistemas Windows.
+- **Impacket** — conjunto de ferramentas Python para protocolos de rede (SMB, Kerberos, etc).
 - **Banner & limpeza** — utilitários para refrescar a interface.
 
 ## Prerequisites
@@ -31,34 +37,64 @@ Before using Dexter Toolkit, make sure you have the following installed:
 
 ## Installation
 
-### Instalação automatizada
+### 🐳 Instalação via Docker (Recomendado)
 
-Os scripts de instalação configuram dependências, clonam repositórios auxiliares (`dirsearch`, `XSStrike`, `SecLists`) e tentam instalar `ffuf`/`subfinder`. Execute o script adequado para o seu ambiente a partir da raiz do repositório:
+A forma mais simples e unificada de usar o Dexter Toolkit é através do Docker. Isso elimina a necessidade de instalar dependências manualmente em diferentes sistemas operacionais.
 
-- Debian, Ubuntu, Kali e derivados:
+#### Pré-requisitos Docker
 
-```bash
-chmod +x install-apt.sh
-sudo ./install-apt.sh
-```
+- **Docker** instalado e em execução
+- **Docker Compose** (opcional, mas recomendado)
 
-- Arch, Manjaro e derivados:
+#### Construir e executar
 
 ```bash
-chmod +x install-arch.sh
-sudo ./install-arch.sh
+# Tornar o script de build executável
+chmod +x build-docker.sh
+
+# Construir a imagem Docker
+./build-docker.sh build
+
+# Executar o container (modo interativo)
+./build-docker.sh run
 ```
 
-- Windows (Git Bash ou WSL):
+Ou usando Docker Compose:
 
 ```bash
-chmod +x install-windows.sh
-./install-windows.sh
+# Construir e iniciar
+docker-compose up --build
+
+# Executar em modo interativo
+docker-compose run --rm dexter
+
+# Parar o container
+docker-compose down
 ```
 
-**Nota:** O script bash funciona no Git Bash (incluído com Git for Windows) ou no WSL. Ele detecta automaticamente `winget` ou `choco` para instalar dependências. Se preferir usar PowerShell, há também `install-windows.ps1` disponível.
+#### Comandos úteis do build-docker.sh
 
-Os scripts detectam gerenciadores (`apt`, `pacman`, `winget`, `choco`, `yay`, `paru`) e utilizam `git pull` quando os diretórios já existem. Ao final, confirme se o diretório de binários do Go (`$(go env GOPATH)/bin`) está no `PATH` quando `go install` for utilizado.
+```bash
+./build-docker.sh build      # Construir a imagem
+./build-docker.sh run        # Executar interativo
+./build-docker.sh start       # Iniciar em background
+./build-docker.sh stop        # Parar container
+./build-docker.sh shell       # Abrir shell no container
+./build-docker.sh logs        # Ver logs
+./build-docker.sh clean       # Remover tudo
+./build-docker.sh update      # Reconstruir imagem
+```
+
+#### Estrutura de volumes Docker
+
+O Docker monta automaticamente os seguintes diretórios:
+- `./wordlists` → `/opt/dexter/wordlists` (wordlists personalizadas)
+- `./seclists` → `/opt/tools/seclists` (SecLists)
+- `./results` → `/opt/dexter/results` (resultados de scans)
+
+### Instalação nativa (alternativa ao Docker)
+
+Se preferir não usar Docker, você pode instalar as ferramentas manualmente seguindo as instruções de cada repositório oficial. O `dexter.sh` detectará automaticamente quais ferramentas estão disponíveis no sistema.
 
 ### Clonando e executando manualmente
 
@@ -111,15 +147,21 @@ Rode o painel principal para acessar o menu interativo:
 
 O menu apresenta as opções abaixo. Apenas as que tiverem binários detectados serão executadas; o restante é ignorado com mensagens informativas.
 
-- `1) Run all available modules` — executa sequencialmente Subfinder, crt.sh, Nmap, Dirsearch, FFUF e XSStrike.
+- `1) Run all available modules` — executa sequencialmente todos os módulos disponíveis.
 - `2) Nmap` — presets interativos com suporte a portas extras.
 - `3) Subdomain enumeration (crt.sh)` — consulta direta à API crt.sh com formatação por `jq` quando disponível.
 - `4) Subfinder` — chama `subfinder -d <domínio>`.
 - `5) Dirsearch` — wrapper simples para `dirsearch.py`, permitindo ajustar extensões e threads.
 - `6) FFUF` — executa `ffuf` com seleção de wordlist e filtros de código/tamanho.
 - `7) XSStrike` — detecta a forma de execução (binário, módulo Python ou repositório local) e oferece presets comuns.
-- `8) Show banner` — redesenha o cabeçalho neon.
-- `9) Clear screen` — limpa o terminal e mostra o banner novamente.
+- `8) HTTPX` — sondagem HTTP/HTTPS com detecção de tecnologias, títulos e status codes.
+- `9) RustScan` — scanner de portas ultrarrápido com integração ao Nmap.
+- `10) SQLMap` — detecção e exploração de vulnerabilidades de injeção SQL.
+- `11) BloodHound` — coleta dados do Active Directory para análise.
+- `12) Evil-WinRM` — shell interativo WinRM para acesso remoto Windows.
+- `13) Impacket` — ferramentas para protocolos de rede (SMB, Kerberos, etc).
+- `14) Show banner` — redesenha o cabeçalho neon.
+- `15) Clear screen` — limpa o terminal e mostra o banner novamente.
 - `0) Exit` — encerra o painel.
 
 **Observação:** todo output é exibido ao vivo no terminal; nenhum arquivo é salvo por padrão. Utilize redirecionamento manual (`tee`, `>` etc.) caso deseje persistir resultados.
@@ -129,16 +171,38 @@ O menu apresenta as opções abaixo. Apenas as que tiverem binários detectados 
 ```
 Dexter_Toolkit/
 ├── dexter.sh             # Painel interativo principal
-├── install-apt.sh        # Instalação automatizada para Debian/Ubuntu/Kali
-├── install-arch.sh       # Instalação automatizada para Arch/Manjaro
-├── install-windows.sh    # Instalação automatizada para Windows (Git Bash/WSL)
-├── install-windows.ps1   # Instalação automatizada para Windows (PowerShell - alternativo)
-├── dirsearch/            # Clonado pelos scripts de instalação (opcional)
-├── XSStrike/             # Clonado pelos scripts de instalação (opcional)
+├── Dockerfile            # Imagem Docker unificada
+├── docker-compose.yml    # Configuração Docker Compose
+├── docker-entrypoint.sh  # Script de entrada do container
+├── build-docker.sh       # Script de gerenciamento Docker
+├── ADDING_TOOLS.md       # Guia para adicionar novas ferramentas
+├── dirsearch/            # Clonado pelo Dockerfile (opcional)
+├── XSStrike/             # Clonado pelo Dockerfile (opcional)
+├── sqlmap/               # Clonado pelo Dockerfile (opcional)
+├── impacket/             # Clonado pelo Dockerfile (opcional)
 ├── seclists/             # Coleção de wordlists (opcional, mas recomendado)
 ├── wordlists/            # Wordlists personalizadas (opcional)
 └── README.md
 ```
+
+## Ferramentas incluídas
+
+O Dexter Toolkit inclui as seguintes ferramentas de segurança:
+
+| Ferramenta | Tipo | Descrição |
+|------------|------|-----------|
+| **nmap** | Binário | Scanner de portas e serviços |
+| **subfinder** | Go | Enumeração de subdomínios |
+| **ffuf** | Go | Web fuzzer rápido |
+| **httpx** | Go | Sondagem HTTP/HTTPS |
+| **rustscan** | Rust | Scanner de portas ultrarrápido |
+| **dirsearch** | Python | Scanner de diretórios web |
+| **XSStrike** | Python | Detector de vulnerabilidades XSS |
+| **sqlmap** | Python | Exploração de injeção SQL |
+| **bloodhound-ce** | Python | Coletor de dados do Active Directory |
+| **evil-winrm** | Ruby/Python | Shell interativo WinRM |
+| **impacket** | Python | Ferramentas para protocolos de rede |
+| **curl/jq** | Binários | Utilitários para APIs e parsing JSON |
 
 ## Contributing
 
